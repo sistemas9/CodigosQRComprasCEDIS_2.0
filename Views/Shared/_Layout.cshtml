@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CodigosQRComprasCEDIS_2._0</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="~/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/css/sweetalert2.css">
+    <link rel="stylesheet" href="~/css/dropzone.css">
+    <link rel="stylesheet" href="~/css/selectize.css">
+</head>
+<body style="overflow:hidden">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3" style="background: rgb(7,128,225); background: linear-gradient(168deg, rgba(7,128,225,1) 35%, rgba(108,20,235,0.7651435574229692) 89%);">
+            <div class="row" style="margin-left:0px;margin-right:0px;width:100%">
+                <div class="col-md-2">
+                    <a class="navbar-brand" asp-area="" asp-controller="CapturadeOC" asp-action="Index">Codigos QR</a>
+                </div>
+                <div class="col-md-2">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+                <div class="col-md-8">
+                    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                        <partial name="_LoginPartial" />
+                        <ul class="navbar-nav flex-grow-1">
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("compras"))
+                            {
+                                String hidden = "";
+                                @if (ViewBag.vista == "capturaOC")
+                                {
+                                    hidden = "";
+                                }
+                                else
+                                {
+                                    hidden = "hidden";
+                                }
+                                <li class="nav-item">
+                                    <a href="javascript:showCaptura()" @hidden style="text-decoration:none;"><i class="fa fa-list-alt fa-2x" style="cursor:pointer;color:white;padding-left:15px;padding-right:15px;"></i> <span style="color:white;">Captura de OC</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="javascript:showCapturaImgs()" @hidden style="text-decoration:none;"><i class="fa fa-cubes fa-2x" style="cursor:pointer;color:white;padding-left:15px;padding-right:15px;"></i> <span style="color:white;">Captura de Lotes</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a style="cursor: pointer;text-decoration:none;" asp-controller="CapturadeOC" asp-action="VisorCodigosQR"><i class="fa fa-table fa-2x" style="cursor:pointer;color:white;padding-left:15px;padding-right:15px;"></i> <span style="color:white;">Resumen de OC</span></a>
+                                </li>
+                            }
+                            else if (User.Identity.IsAuthenticated && User.IsInRole("almacen"))
+                            {
+                                <li class="nav-item">
+                                    <a style="cursor: pointer; text-decoration:none;" asp-controller="Cedis" asp-action="Index"><i class="fa fa-cubes fa-2x" style="cursor:pointer;color:white;padding-left:15px;padding-right:15px;" onclick="showCapturaImgs()"></i> <span style="color:white;">Captura de Lotes</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a style="cursor: pointer;text-decoration:none;" asp-controller="CapturadeOC" asp-action="VisorCodigosQR"><i class="fa fa-table fa-2x" style="cursor:pointer;color:white;padding-left:15px;padding-right:15px;"></i> <span style="color:white;">Resumen de OC</span></a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div>
+        @RenderBody()
+    </div>
+    @if (User.Identity.IsAuthenticated && !User.IsInRole("almacen") && ViewBag.vista == "capturaOC")
+    {
+    <div class="row" style="bottom: 60px;position: absolute;width:100%;">
+        <div class="col-md-12 oculta" style="position:relative;height:180px;">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link nav-series active" data-toggle="tab" href="#numerosSerie">Numeros de Serie</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="max-height:180px;overflow-y:scroll;overflow-x:hidden;">
+                <div class="tab-pane active" id="numerosSerie">
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+    <footer class="border-top footer text-muted" style="z-index:2;background-color:white;">
+        <div class="container">
+            &copy; 2020 - Avance y Tecnologia en Plásticos - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> Fase II
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/capturaDeOC.js" asp-append-version="true"></script>
+    <script src="~/js/Cedis.js" asp-append-version="true"></script>
+    <script src="~/js/jquery.dataTables.min.js" asp-append-version="true"></script>
+    <script src="~/js/sweetalert2.js" asp-append-version="true"></script>
+    <script src="~/js/dropzone.js" asp-append-version="true"></script>
+    <script src="~/js/selectize.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

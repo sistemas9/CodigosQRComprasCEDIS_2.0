@@ -1,0 +1,29 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:46940",
+      "sslPort": 44359
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "CodigosQRComprasCEDIS_2._0": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_URLS": "https://localhost:6061;http://localhost:6060",
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      },
+      "nativeDebugging": false,
+      "applicationUrl": "https://localhost:6061;http://localhost:6060"
+    }
+  }
+}

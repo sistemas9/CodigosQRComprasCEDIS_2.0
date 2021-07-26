@@ -1,0 +1,254 @@
+﻿
+@{
+    var UserName = User.Identities.ToArray();
+    ViewData["Title"] = "Captura de OC";
+}
+<style>
+    .capturaOC {
+        display: none;
+    }
+
+
+    .capturaOCImgs {
+        display: none;
+    }
+
+    #tablaOCs {
+        text-transform: uppercase;
+    }
+
+    .selectize-input {
+        font-size: 32px;
+        line-height: 32px;
+        width: 30%
+    }
+
+    .selectize-dropdown {
+        font-size: 28px;
+        line-height: 28px;
+    }
+
+    .oculta {
+        position: relative;
+        bottom: 42px;
+        transform: translate(0, 100%);
+        transition: 0.5s;
+    }
+
+    .visible{
+        position: relative;
+        bottom: 42px;
+        transform: translate(0, 0%);
+        transition: 0.5s;
+    }
+
+    .selectedSerie{
+        background-color: navajowhite !important;
+    }
+</style>
+<div class="col-md-12 box-shadow capturaOC capturaOCDiv" style="text-align:center;border-bottom: solid 1px #CCC;padding-bottom: 20px;">
+    <label for="ordenVta" style="font-size: 35px;">Ingrese la Orden de Compra: </label><br>
+    <span class="input-group-addon" id="basic-addon1" style="font-size:32px;border:solid 1px #CCC;padding-bottom:4px;margin-right:-4px;">OC-</span>
+    <input type="number" name="ordenVta" id="ordenVta" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" onkeypress="getDataOC(this.value,event,'@Url.Action("GetDataOC","CapturadeOC")','@Url.Content("~/")')" style="width: 10%; font-size: 29px;" />
+</div>
+<div class="row capturaOC" style="padding-top:20px;">
+    <div class="col-md-1">&nbsp;&nbsp;</div>
+    <div class="col-md-2">
+        <label for="purchaseOrderNumber" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">ORDEN DE COMPRA:</label>
+        <span id="purchaseOrderNumber" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-2">
+        <label for="purchaseOrderName" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">PROVEEDOR:</label>
+        <span id="purchaseOrderName" class="form-text"></span>
+    </div>
+    <div class="col-md-2">
+        <label for="requestedDeliveryDate" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">FECHA ENTREGA:</label>
+        <span id="requestedDeliveryDate" data-fecha="" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-2">
+        <label for="buyerGroupId" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">GRUPO DE COMPRA: </label>
+        <span id="buyerGroupId" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-2">
+        <label for="currencyCode" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">MONEDA: </label>
+        <span id="currencyCode" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-1">&nbsp;&nbsp;</div>
+</div>
+<div class="row box-shadow capturaOC" style="padding-bottom: 20px;border-bottom:solid 1px #CCC;">
+    <div class="col-md-3">&nbsp;</div>
+    <div class="col-md-3">
+        <label for="defaultReceivingSiteId" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">SITIO: </label>
+        <span id="defaultReceivingSiteId" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-3">
+        <label for="defaultReceivingWarehouseId" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">ALMACEN: </label>
+        <span id="defaultReceivingWarehouseId" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-3">&nbsp;</div>
+</div>
+<div class="row capturaOC" style="padding-top:40px;">
+    <div class="col-md-2">&nbsp;</div>
+    <div class="col-md-8" style="max-height:300px;overflow-y:scroll;">
+        <table class="table" id="tablaOCs">
+            <thead>
+                <tr>
+                    <th style="width:20%;">No. Línea</th>
+                    <th style="width:10%;">Código</th>
+                    <th style="width:30%;">Descripción</th>
+                    <th style="width:10%;">Cantidad</th>
+                    <th style="width:10%;">Unidad</th>
+                    <th style="width:10%;">Opciones <div class="col-md-12" style="text-align:center;"><span style="font-size:10px">Todos &nbsp;</span><input type="checkbox" onclick="javascript:$('.chkSeleccionar').click()" style="width:20px;height:20px;" /></div></th>
+                    <th style="width:05%;">Sin Lote <div class="col-md-12" style="text-align:center;"><span style="font-size:10px">Todos &nbsp;</span><input type="checkbox" onclick="javascript:$('.chkSinLote').click()" style="width:20px;height:20px;" /></div></th>
+                    <th style="width:05%;">Series </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-2" style="padding-right:25px;">
+        <button class="btn btn-info" type="button" id="saveOCbtn" onclick="saveOrdenCompra('@Url.Action("SaveDataOC","CapturadeOC")')" style="width: 100%;height: 100%;font-size: 45px;font-weight: bolder;" disabled><i class="fa fa-check fa-1x" style="pointer-events:none !important;color:white;">Guardar</i></button>
+    </div>
+</div>
+<div class="row capturaOCImgs capturaOCImgsDiv">
+    <div class="col-md-12" style="text-align:center;border-bottom: solid 1px #CCC;padding-bottom: 20px;">
+        <label for="ordenVta" style="font-size: 35px;">Ingrese la Orden de Compra: </label><br>
+        <select id="ordenCompraCapturada" onchange="getDataOCCodigos(this.value,event,'@Url.Action("GetDataOCCodigos","CapturadeOC")','@Url.Content("~/")')" style="display:none;">
+            <option value="0" selected>Seleccione una Orden de Compra</option>
+        </select>
+    </div>
+</div>
+<div class="row capturaOCImgs" style="padding-top:20px;">
+    <div class="col-md-1">&nbsp;&nbsp;</div>
+    <div class="col-md-2">
+        <label for="purchaseOrderNumberImg" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">ORDEN DE COMPRA:</label>
+        <span id="purchaseOrderNumberImg" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-2">
+        <label for="purchaseOrderNameImg" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">PROVEEDOR:</label>
+        <span id="purchaseOrderNameImg" class="form-text"></span>
+    </div>
+    <div class="col-md-2">
+        <label for="requestedDeliveryDateImg" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">FECHA ENTREGA:</label>
+        <span id="requestedDeliveryDateImg" data-fecha="" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-2">
+        <label for="buyerGroupIdImg" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">GRUPO DE COMPRA: </label>
+        <span id="buyerGroupIdImg" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-2">
+        <label for="currencyCodeImg" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">MONEDA: </label>
+        <span id="currencyCodeImg" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-1">&nbsp;&nbsp;</div>
+</div>
+<div class="row box-shadow capturaOCImgs" style="padding-bottom: 20px;border-bottom:solid 1px #CCC;">
+    <div class="col-md-3">&nbsp;</div>
+    <div class="col-md-3">
+        <label for="defaultReceivingSiteIdImg" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">SITIO: </label>
+        <span id="defaultReceivingSiteIdImg" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-3">
+        <label for="defaultReceivingWarehouseIdImg" class="form-label" style="width:100%;text-align:center;font-weight:bolder;">ALMACEN: </label>
+        <span id="defaultReceivingWarehouseIdImg" class="form-text" style="width:100%;text-align:center;"></span>
+    </div>
+    <div class="col-md-3">&nbsp;</div>
+</div>
+<div class="row capturaOCImgs" style="padding-top:40px;">
+    <div class="col-md-2">&nbsp;</div>
+    <div class="col-md-8" style="max-height:300px;overflow-y:scroll;">
+        <table class="table" id="tablaOCCodigos">
+            <thead>
+                <tr>
+                    <th style="width:10%;">No. Línea</th>
+                    <th style="width:10%;">Código</th>
+                    <th style="width:50%;">Descripción</th>
+                    <th style="width:10%;">Cantidad</th>
+                    <th style="width:10%;">Unidad</th>
+                    <th style="width:10%;">Sin Lote</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-2">
+        <button class="btn" id="showModImgsBtn" onclick="showCarrusel(this)">
+            <label class="form-control">
+                Mostrar imagen(es)
+            </label>
+            <i class="fa fa-image fa-4x"></i>
+        </button>
+    </div>
+</div>
+<input type="hidden" data-request-url="@Url.Action("getListOC", "CapturadeOC")" id="urlGetListaOCs" />
+<input type="hidden" data-request-url="@Url.Action("GetImagesPaths", "CapturadeOC")" id="urlImagesPaths" />
+<input type="hidden" data-request-url="@Url.Action("SaveImagesComent", "CapturadeOC")" id="urlSaveImagesComent" />
+<input type="hidden" data-request-url="@Url.Action("RemoveLoteComent", "CapturadeOC")" id="urlRemoveLoteComent" />
+<input type="hidden" data-request-url="@Url.Action("SendMailRecibos", "CapturadeOC")" id="urlSendMailRecibos" />
+<input type="hidden" data-request-url="@Url.Action("AsignarSeries", "CapturadeOC")" id="urlAsignarSeries" />
+<input type="hidden" data-request-url="@Url.Action("EnviarPDF", "CapturadeOC")" data-raiz="@Url.Content("~/")" id="urlEnviarPDF" />
+@*<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body">
+
+    </div>
+</div>*@
+<div class="modal" tabindex="-1" role="dialog" id="modalSeries">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Asignar numero de Series</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-content"></div>                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            getListaOCCapturadas();
+
+            $(document).on('click', '#tablaOCCodigos tbody tr td:not(:last-child)', function () {
+                var row = $(this).closest('tr');
+                if (!$(row).hasClass('completed')) {
+                    var tdLineNumber = $(row).find('td')[0];
+                    var tdLineDescription = $(row).find('td')[2];
+                    var tdItemNumber = $(row).find('td')[1];
+                    var tdCantidad = $(row).find('td')[3];
+                    var purchaseOrderNumber = $('#ordenCompraCapturada').val();
+                    var lineNumber = $(tdLineNumber).html();
+                    var itemNumber = $(tdItemNumber).html();
+                    var cantidad = $(tdCantidad).find('input.canti').val();
+                    var description = '<b>' + itemNumber + '</b> ' + $(tdLineDescription).html();
+                    var checkSinLote = $(row).find('input.chkSinLote');
+                    $(checkSinLote).removeAttr('disabled');
+                    $(checkSinLote).prop('checked', false);
+                    cargarLotesComent(purchaseOrderNumber, lineNumber, itemNumber, description, row, cantidad);
+                }
+            });
+
+            $(document).on('click', '#tablaOCs tbody tr', function () {
+                var chkSerie = $(this).find('input.chkSeries');
+                if ($(chkSerie).is(':checked')) {
+                    $('#tablaOCs tbody tr').removeClass('selectedSerie');
+                    $(this).toggleClass('selectedSerie');
+                    checarRowSerie(chkSerie);
+                }
+            });
+        });
+    </script>
+}

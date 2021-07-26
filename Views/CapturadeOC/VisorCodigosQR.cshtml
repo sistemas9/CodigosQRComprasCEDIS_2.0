@@ -1,0 +1,66 @@
+﻿
+@{
+    ViewData["Title"] = "VisorCodigosQR";
+}
+<div class="row">
+    <div class="col-md-12" style="height:350px;outline:solid #CCC; top:0px; max-height:300px;overflow-y:scroll;">
+        <table class="table" id="tablaVisorQR">
+            <thead>
+                <tr>
+                    <th>Orden de Compra</th>
+                    <th>Proveedor</th>
+                    <th>Fecha de entrega</th>
+                    <th>Grupo de compras</th>
+                    <th>Moneda</th>
+                    <th>Sitio</th>
+                    <th>Almacen</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-12" style="height:350px;outline:solid #CCC; bottom:0px; max-height:300px;overflow-y:scroll;">
+        <form id="pdfForm" target="_blank" method="post" enctype="multipart/form-data" action="@Url.Action("ConvertToPDF", "CapturadeOC")">
+            <input type="hidden" id="html" name="html" value="" />
+        </form>
+        <table class="table" id="tablaVisorLineasQR">
+            <thead>
+                <tr>
+                    <th style="width:08%;">No. Línea</th>
+                    <th style="width:08%;">Código</th>
+                    <th style="width:16%;">Descripción</th>
+                    <th style="width:08%;">Cantidad</th>
+                    <th style="width:10%;">Unidad</th>
+                    <th style="width:10%;">Lote</th>
+                    <th style="width:10%;">QR</th>
+                    <th style="width:10%;">Comentario</th>
+                    <th style="width:10%;">Serie</th>
+                    <th style="width:10%;">Imprimir</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<input type="hidden" data-request-url="@Url.Action("CargarDataOCVisor", "CapturadeOC")" data-raiz="@Url.Content("~/")" id="urlCargaTablaInicial" />
+<input type="hidden" data-request-url="@Url.Action("GetDataLineasVisor", "CapturadeOC")" data-raiz="@Url.Content("~/")" id="urlCargaTablaLineas" />
+<input type="hidden" data-request-url="@Url.Action("ConvertToPDF", "CapturadeOC")" data-raiz="@Url.Content("~/")" id="urlConvertToPDF" />
+<input type="hidden" data-request-url="@Url.Action("EnviarPDF", "CapturadeOC")" data-raiz="@Url.Content("~/")" id="urlEnviarPDF" />
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            cargarTablaOC();
+            $(document).on('click', '#tablaVisorQR tbody tr', function () {
+                var lineas = $('#tablaVisorQR').dataTable().fnGetNodes();
+                $(lineas).removeClass('selected');
+                $(this).addClass('selected');
+                var oc = $(this).data('oc');
+                var tdItemNumber = $(this).find('td')[1];
+                var revision = $(this).data('revision');
+                cargarTablaLineas(oc,revision);
+            });
+        });
+    </script>
+}
