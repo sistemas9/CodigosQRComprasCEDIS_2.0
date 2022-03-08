@@ -23,17 +23,17 @@ namespace CodigosQRComprasCEDIS_2._0.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetDataOCAsync(String OC, String Revision)
+        public async Task<JsonResult> GetDataOCAsync(String OC, String Revision, String Company)
         {
-            CapturadeOC capturadeOC = new CapturadeOC();
+            CapturadeOC capturadeOC = new CapturadeOC(Company);
             ResponseOrdenCompra oc = await capturadeOC.GetDataOC(OC);
-            Cedis cedisLine = new Cedis();
+            Cedis cedisLine = new Cedis(Company);
             List<String[]> ocLine = await cedisLine.GetDataOCLinea(OC, Revision);
-            return Json(new { data = ocLine, dataocHead = oc });
+            return Json(new { data = ocLine, dataocHead = (oc.value.Count > 0) ? oc.value[0] : null });
         }
 
         [HttpPost]
-        public async Task<ActionResult> UploadFilesAsync(String purchaseOrderNumber,String revision, String purchaseOrderNumberRev)
+        public async Task<ActionResult> UploadFilesAsync(String purchaseOrderNumber,String revision, String purchaseOrderNumberRev,String Company)
         {
             IFormFileCollection files = Request.Form.Files;
             var fail = false;
@@ -41,7 +41,7 @@ namespace CodigosQRComprasCEDIS_2._0.Controllers
             foreach (IFormFile file in files)
             //for(int i = 0; i < files.Count; i++)  
             {
-                Cedis cedisImages = new Cedis();
+                Cedis cedisImages = new Cedis(Company);
                 result = await cedisImages.uploadFiles(file, purchaseOrderNumber, revision, purchaseOrderNumberRev, User.Identity.Name);
                 if (result.estatus == "FailDuplicado")
                 {
@@ -60,38 +60,38 @@ namespace CodigosQRComprasCEDIS_2._0.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> GetServerDocsAsync(String purchaseOrderNumber, String lineNumber, String itemNumber)
+        public async Task<ActionResult> GetServerDocsAsync(String purchaseOrderNumber, String lineNumber, String itemNumber,String Company)
         {
-            Cedis cedisImgs = new Cedis();
+            Cedis cedisImgs = new Cedis(Company);
             var result = await cedisImgs.getServerDocs(purchaseOrderNumber, lineNumber, itemNumber);
             return Ok(new { mockfiles = result });
         }
 
         [HttpPost]
-        public async Task<ActionResult> RemoveFilesAsync(String purchaseOrderNumber, String lineNumber, String itemNumber, int idCodigos)
+        public async Task<ActionResult> RemoveFilesAsync(String purchaseOrderNumber, String lineNumber, String itemNumber, int idCodigos,String Company)
         {
-            Cedis cedisRemoveImage = new Cedis();
+            Cedis cedisRemoveImage = new Cedis(Company);
             var result = await cedisRemoveImage.removeFiles(purchaseOrderNumber, lineNumber, itemNumber, idCodigos);
             return Ok(result);
         }
 
-        public async Task<ActionResult> GetListOCAsync()
+        public async Task<ActionResult> GetListOCAsync(String Company)
         {
-            Cedis cedisOC = new Cedis();
+            Cedis cedisOC = new Cedis(Company);
             List<OCList> ListaOc = await cedisOC.getListOC();
             return Json(new { data = ListaOc });
         }
 
-        public async Task<JsonResult> SendMailComprasAsync(String oc, String revision)
+        public async Task<JsonResult> SendMailComprasAsync(String oc, String revision,String Company)
         {
-            Cedis captura = new Cedis();
+            Cedis captura = new Cedis(Company);
             var result = await captura.SendMailCompras(oc, revision);
             return Json(result);
         }
 
-        public async Task<JsonResult> SetSubrevisionAsync(List<SubRevision> subRev, String revision)
+        public async Task<JsonResult> SetSubrevisionAsync(List<SubRevision> subRev, String revision,String Company)
         {
-            Cedis cedisSubRev = new Cedis();
+            Cedis cedisSubRev = new Cedis(Company);
             var result = await cedisSubRev.SetSubrevision(subRev,revision);
             return Json(result);
         }

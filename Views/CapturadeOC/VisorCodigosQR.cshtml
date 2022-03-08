@@ -21,27 +21,29 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-12" style="height:350px;outline:solid #CCC; bottom:0px; max-height:300px;overflow-y:scroll;">
+    <div class="col-md-12" style="height:350px;outline:solid #CCC; bottom:0px; max-height:300px; overflow-y:scroll; margin-top: 20px;">
         <form id="pdfForm" target="_blank" method="post" enctype="multipart/form-data" action="@Url.Action("ConvertToPDF", "CapturadeOC")">
             <input type="hidden" id="html" name="html" value="" />
         </form>
         <table class="table" id="tablaVisorLineasQR">
             <thead>
                 <tr>
-                    <th style="width:08%;">No. Línea</th>
-                    <th style="width:08%;">Código</th>
-                    <th style="width:16%;">Descripción</th>
-                    <th style="width:08%;">Cantidad</th>
+                    <th style="width:10%;">No. Línea</th>
+                    <th style="width:10%;">Código</th>
+                    <th style="width:20%;">Descripción</th>
+                    <th style="width:10%;">Cantidad</th>
                     <th style="width:10%;">Unidad</th>
                     <th style="width:10%;">Lote</th>
                     <th style="width:10%;">QR</th>
                     <th style="width:10%;">Comentario</th>
                     <th style="width:10%;">Serie</th>
-                    <th style="width:10%;">Imprimir</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
+    </div>
+    <div style="margin-top:10px">
+      <button id="buttonPDF" style=" border-style: none; background: none; position: fixed; right: 2em; bottom: 9em;"><i class="fa fa-file-pdf-o fa-2x" style="cursor:pointer" onclick="convertToPDF()"></i></button>
     </div>
 </div>
 <input type="hidden" data-request-url="@Url.Action("CargarDataOCVisor", "CapturadeOC")" data-raiz="@Url.Content("~/")" id="urlCargaTablaInicial" />
