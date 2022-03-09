@@ -324,7 +324,12 @@ function saveOrdenCompra(url) {
         $('body .lean-overlay').remove();
         swal("Exito!", "Operacion realizada existosamente!", "success")
           .then(function () {
-            sendMailRecibos(data.purchaseOrderNumber, data.revision)
+            if ($('#togBtn').is(':checked')) {
+              company = 'lin';
+            } else {
+              company = 'atp';
+            }
+            sendMailRecibos(data.purchaseOrderNumber, data.revision, company);
             setTimeout(function () {
               location.reload();
             }, 500);
@@ -467,10 +472,17 @@ function cargarLotesComent(purchaseOrderNumber, lineNumber, itemNumber, descript
       var lineNumber = $('#lineNumberHidden').val();
       var itemNumber = $('#itemNumberHidden').val();
       dataOC = purchaseOrderNumber.split('-');
-      oc = 'OC-' + dataOC[0];
-      revision = dataOC[1];
-      ocRevision = oc + "-Rev" + revision;
-      ocLote = 'OC' + dataOC[0];
+      if (company == 'atp') {        
+        oc = 'OC-' + dataOC[1];
+        revision = dataOC[2];
+        ocRevision = oc + "-Rev" + revision;
+        ocLote = 'OC' + dataOC[1];
+      } else {
+        oc = 'L-OC' + dataOC[0];
+        revision = dataOC[1];
+        ocRevision = oc + "-Rev" + revision;
+        ocLote = 'LOC' + dataOC[0];
+      }
       var data = { purchaseOrderNumber: oc, lineNumber, itemNumber };
       ///////////validar lotes vacios////////////////////////////////
       var validoLote = true;
@@ -509,10 +521,17 @@ function cargarLotesComent(purchaseOrderNumber, lineNumber, itemNumber, descript
     },
     onOpen: function () {
       dataOC = purchaseOrderNumber.split('-');
-      oc = 'OC-' + dataOC[0];
-      revision = dataOC[1];
-      ocRevision = oc + "-Rev" + revision;
-      ocLote = 'OC' + dataOC[0];
+      if (company == 'atp') {
+        oc = 'OC-' + dataOC[1];
+        revision = dataOC[2];
+        ocRevision = oc + "-Rev" + revision;
+        ocLote = 'OC' + dataOC[1];
+      } else {
+        oc = 'L-OC' + dataOC[0];
+        revision = dataOC[1];
+        ocRevision = oc + "-Rev" + revision;
+        ocLote = 'LOC' + dataOC[0];
+      }
       getImagesRoutes(ocRevision, lineNumber, itemNumber, oc, revision);
     }
   }).then(function (result) {
@@ -554,11 +573,18 @@ function cargarLotesComent(purchaseOrderNumber, lineNumber, itemNumber, descript
                 }).then(function (result) {
                   if (result) {
                     dataOC = purchaseOrderNumber.split('-');
-                    oc = 'OC-' + dataOC[0];
-                    revision = dataOC[1];
-                    ocRevision = oc + "-Rev" + revision;
-                    ocLote = 'OC' + dataOC[0];
-                    convertToPDF(oc, revision, ocLote);
+                    if (company == 'atp') {
+                      oc = 'OC-' + dataOC[1];
+                      revision = dataOC[2];
+                      ocRevision = oc + "-Rev" + revision;
+                      ocLote = 'OC' + dataOC[1];
+                    } else {
+                      oc = 'L-OC' + dataOC[0];
+                      revision = dataOC[1];
+                      ocRevision = oc + "-Rev" + revision;
+                      ocLote = 'LOC' + dataOC[0];
+                    }
+                    convertToPDF(oc, revision, ocLote,company);
                     setTimeout(function () {
                       location.reload();
                     }, 500);
@@ -827,9 +853,10 @@ function cargarTablaLineas(oc, revision) {
       $('body').removeClass('load-ajax');
       $('body .lean-overlay').remove();
       html = json;
-      ocPDF = html.data[0][9]
-      revisionPDF = html.data[0][10]
-      ocLotePDF = html.data[0][11]
+      ocPDF = html.data[0][9];
+      revisionPDF = html.data[0][10];
+      ocLotePDF = html.data[0][11];
+      $("#buttonPDF").html(html.data[0][12]);
     },
     columns: [
       { title: 'No. de Línea', width: '10%' },
@@ -857,13 +884,13 @@ function convertToPDF(ocPDF, revisionPDF, ocLotePDF) {
     var content = JSON.stringify(html)
     $('#html').val(content);
     $('#pdfForm').submit();
-
+    company = companyLotes(ocPDF + '-' + revisionPDF);
     //////////////////////enviar correo de pdf////////////////////////////
     $.ajax({
       url: url,
       type: 'POST',
       dataType: 'json',
-      data: { ocPDF, revisionPDF, ocLotePDF },
+      data: { ocPDF, revisionPDF, ocLotePDF,company },
       beforeSend: function () {
         $('body').attr('data-msj', 'Enviando correo!. ...');
         $('body').addClass('load-ajax');
@@ -904,13 +931,13 @@ function showCarrusel(obj) {
 /*** Funcion para mandar correo de captura de
 **** orden de compra dirigida a recibos (CEDIS)
 ***/
-function sendMailRecibos(oc, revision) {
+function sendMailRecibos(oc, revision,company) {
   var url = $('#urlSendMailRecibos').data('request-url');
   $.ajax({
     url: url,
     type: 'POST',
     dataType: "JSON",
-    data: { oc, revision },
+    data: { oc, revision,company },
     beforeSend: function () {
       $('body').attr('data-msj', 'Enviando correo ...');
       $('body').addClass('load-ajax');

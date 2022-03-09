@@ -324,6 +324,7 @@
           var checkSinLote = $(row).find('input.chkSinLote');
           $(checkSinLote).removeAttr('disabled');
           $(checkSinLote).prop('checked', false);
+          company = companyLotes(purchaseOrderNumber);
           cargarLotesComent(purchaseOrderNumber, lineNumber, itemNumber, description, row, cantidad);
         }
       });

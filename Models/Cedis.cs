@@ -428,7 +428,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
       return ocList;
     }
 
-    public async Task<String> SendMailCompras(String oc, String revision)
+    public async Task<String> SendMailCompras(String oc, String revision,String legalEntity)
     {
       MemoryStream memoStream = new MemoryStream();
       SmtpClient client = new SmtpClient();
@@ -437,11 +437,21 @@ namespace CodigosQRComprasCEDIS_2._0.Models
       MailMessage mail = new MailMessage();
       String body = "";
       String company;
+      String companySubject;
       String cfdiCuenta;
 
       try
       {
-        company = "Avance y Tecnologia en Plasticos S.A. de C.V.";
+        if (legalEntity == "atp")
+        {
+          company = "Avance y Tecnologia en Plasticos S.A. de C.V.";
+          companySubject = "AVANCE";
+        }
+        else
+        {
+          company = "Lideart Innovación, S. de R.L. de C.V.";
+          companySubject = "LIDEART";
+        }
         client.Port = 587;
         //client.Port = 465;
         client.DeliveryMethod = SmtpDeliveryMethod.Network;
@@ -465,7 +475,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><SPAN style=\"mso-spacerun: yes\"><FONT face=Calibri></FONT></SPAN></SPAN>&nbsp;</P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>Saludos cordiales. </FONT></SPAN></P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>" + company + "</FONT></SPAN></P></FONT></SPAN></BODY></html>";
-        mail.Subject = "Codigos QR de OC: " + oc;
+        mail.Subject = "Codigos QR de OC (" + companySubject + "): " + oc;
         mail.Body = body;
         mail.IsBodyHtml = true;
 
@@ -497,8 +507,8 @@ namespace CodigosQRComprasCEDIS_2._0.Models
         foreach (String corr in correosArr)
         {
           //CORREGIR: Quitar el console writeline
-          //mail.To.Add(corr);
-          Console.WriteLine(corr);
+          mail.To.Add(corr);
+          //Console.WriteLine(corr);
         }
         readerCorreos.Close();
         //mail.Attachments.Add(new System.Net.Mail.Attachment(stream, oc + ".pdf"));

@@ -299,7 +299,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
           query += "AND itemNumber = '" + ocData.ItemNumber.ToString() + "'  ";
           query += "AND recibido = 1  ";
           query += "AND revision = " + revision + " ";
-          query += "OR ( hasSubRevision = 1 AND itemNumber = '" + ocData.ItemNumber.ToString() + "' ); ";
+          query += "OR ( hasSubRevision = 1 AND itemNumber = '" + ocData.ItemNumber.ToString() + "' AND PurchaseOrderNumber = '" + OC + "' ); ";
           if (this.company == "atp")
           {
             if (config != "DESARROLLO")
@@ -955,7 +955,8 @@ namespace CodigosQRComprasCEDIS_2._0.Models
                                 reader[9].ToString(),
                                 OC,
                                 reader[7].ToString(),
-                                reader[8].ToString().Replace("-", "")
+                                reader[8].ToString().Replace("-", ""),
+                                pdf
 
               };
               ocLineas.Add(ocL);
@@ -972,7 +973,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
       return ocLineas;
     }
 
-    public async Task<String> SendMail(String oc, String revision, String ocLote)
+    public async Task<String> SendMail(String oc, String revision, String ocLote, String legalEntity)
     {
       MemoryStream memoStream = new MemoryStream();
       SmtpClient client = new SmtpClient();
@@ -980,11 +981,21 @@ namespace CodigosQRComprasCEDIS_2._0.Models
       MailMessage mail = new MailMessage();
       String body = "";
       String company;
+      String companySubject;
       String cfdiCuenta;
 
       try
       {
-        company = "Avance y Tecnologia en Plasticos S.A. de C.V.";
+        if (legalEntity == "atp")
+        {
+          company = "Avance y Tecnologia en Plasticos S.A. de C.V.";
+          companySubject = "AVANCE";
+        }
+        else
+        {
+          company = "Lideart Innovación, S. de R.L. de C.V.";
+          companySubject = "LIDEART";
+        }
         client.Port = 587;
         //client.Port = 465;
         client.DeliveryMethod = SmtpDeliveryMethod.Network;
@@ -1001,7 +1012,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>A quien corresponda: </FONT></SPAN></P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>&nbsp;</FONT></SPAN></P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri></FONT></SPAN>&nbsp;</P>";
-        body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>Usted está<SPAN style=\"mso-spacerun: yes\">&nbsp; </SPAN>recibiendo una notificacion de una captura de lotes" + company + "</FONT></SPAN></P>";
+        body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>Usted está<SPAN style=\"mso-spacerun: yes\">&nbsp; </SPAN>recibiendo una notificacion de una captura de lotes " + company + "</FONT></SPAN></P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>Dicha captura se podrá<SPAN style=\"mso-spacerun: yes\">&nbsp; </SPAN>visualizar en PDF e imprimirlo libremente </FONT></SPAN></P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>Por parte del departamento de compras se envían lotes finales</FONT></SPAN></P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>&nbsp;</FONT></SPAN></P>";
@@ -1009,7 +1020,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><SPAN style=\"mso-spacerun: yes\"><FONT face=Calibri></FONT></SPAN></SPAN>&nbsp;</P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>Saludos cordiales. </FONT></SPAN></P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>" + company + "</FONT></SPAN></P></FONT></SPAN></BODY></html>";
-        mail.Subject = "Codigos QR de OC: " + oc;
+        mail.Subject = "Codigos QR de OC ("+companySubject+"): " + oc;
         mail.Body = body;
         mail.IsBodyHtml = true;
 
@@ -1060,8 +1071,8 @@ namespace CodigosQRComprasCEDIS_2._0.Models
         {
           foreach (String mailStr in corr)
           {
-            //mail.To.Add(mailStr);
-            Console.WriteLine(mailStr);
+            mail.To.Add(mailStr);
+            //Console.WriteLine(mailStr);
           }
 
         }
@@ -1167,7 +1178,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
       return ocList;
     }
 
-    public async Task<String> SendMailRecibos(String oc, String revision)
+    public async Task<String> SendMailRecibos(String oc, String revision, String legalEntity)
     {
       MemoryStream memoStream = new MemoryStream();
       SmtpClient client = new SmtpClient();
@@ -1176,11 +1187,21 @@ namespace CodigosQRComprasCEDIS_2._0.Models
       MailMessage mail = new MailMessage();
       String body = "";
       String company;
+      String companySubject;
       String cfdiCuenta;
 
       try
       {
-        company = "Avance y Tecnologia en Plasticos S.A. de C.V.";
+        if (legalEntity == "atp")
+        {
+          company = "Avance y Tecnologia en Plasticos S.A. de C.V.";
+          companySubject = "AVANCE";
+        }
+        else
+        {
+          company = "Lideart Innovación, S. de R.L. de C.V.";
+          companySubject = "LIDEART";
+        }
         client.Port = 587;
         //client.Port = 465;
         client.DeliveryMethod = SmtpDeliveryMethod.Network;
@@ -1205,7 +1226,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><SPAN style=\"mso-spacerun: yes\"><FONT face=Calibri></FONT></SPAN></SPAN>&nbsp;</P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>Saludos cordiales. </FONT></SPAN></P>";
         body += "<P class=MsoPlainText style=\"MARGIN: 0cm 0cm 0pt\"><SPAN style=\"FONT-SIZE: 12pt\"><FONT face=Calibri>" + company + "</FONT></SPAN></P></FONT></SPAN></BODY></html>";
-        mail.Subject = "Codigos QR de OC: " + oc;
+        mail.Subject = "Codigos QR de OC (" + companySubject + "): " + oc;
         mail.Body = body;
         mail.IsBodyHtml = true;
 
@@ -1247,8 +1268,8 @@ namespace CodigosQRComprasCEDIS_2._0.Models
         foreach (String corr in correosArr)
         {
           //Corregir: quitar console writeline
-          //mail.To.Add(corr);
-          Console.WriteLine(corr);
+          mail.To.Add(corr);
+          //Console.WriteLine(corr);
         }
         readerCorreos.Close();
         //////get stream of pdf////////////////////////////////////////////////////////
@@ -1266,6 +1287,7 @@ namespace CodigosQRComprasCEDIS_2._0.Models
         mail.From = fromATP;
         mail.To.Add("sistemas13@avanceytec.com.mx");
         mail.To.Add("sistemas03@avanceytec.com.mx");
+        mail.To.Add("sistemas09@avanceytec.com.mx");
         client.Send(mail);
         mail.Attachments.Clear();
         mail.To.Clear();

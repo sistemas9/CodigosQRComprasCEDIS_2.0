@@ -82,10 +82,10 @@ namespace CodigosQRComprasCEDIS_2._0.Controllers
             return Json(new { data = ListaOc });
         }
 
-        public async Task<JsonResult> SendMailComprasAsync(String oc, String revision,String Company)
+        public async Task<JsonResult> SendMailComprasAsync(String oc, String revision,String company)
         {
-            Cedis captura = new Cedis(Company);
-            var result = await captura.SendMailCompras(oc, revision);
+            Cedis captura = new Cedis(company);
+            var result = await captura.SendMailCompras(oc, revision,company);
             return Json(result);
         }
 

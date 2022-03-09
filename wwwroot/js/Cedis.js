@@ -225,7 +225,8 @@ function getDataOCCedis(oc, ev, url, raiz) {
             //    $('#showModImgsBtn').removeAttr('data-revision');
             //    //setRevisionCedis(purchaseOrderNumber);
             //});
-            sendMailCompras(purchaseOrderNumber, revision);
+            company = companyCedis($('#ordenCompraCapturada').val());
+            sendMailCompras(purchaseOrderNumber, revision,company);
             setTimeout(() => {
               location.reload();
             }, 5000);
@@ -548,13 +549,13 @@ function getDataOCCedis(oc, ev, url, raiz) {
   /*** Funcion para mandar correo de captura de
   **** orden de compra dirigida a compras con la captura de imagenes
   ***/
-  function sendMailCompras(oc, revision) {
+  function sendMailCompras(oc, revision,company) {
     var url = $('#urlSendMailCompras').data('request-url');
     $.ajax({
       url: url,
       type: 'POST',
       dataType: "JSON",
-      data: { oc, revision },
+      data: { oc, revision,company },
       beforeSend: function () {
         $('body').attr('data-msj', 'Enviando correo ...');
         $('body').addClass('load-ajax');

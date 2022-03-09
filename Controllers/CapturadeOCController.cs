@@ -135,7 +135,7 @@ namespace CodigosQRComprasCEDIS_2._0.Controllers
     public IActionResult EnviarPDF(String ocPDF, String revisionPDF, String ocLotePDF, String Company)
     {
       CapturadeOC capturadeOC = new CapturadeOC(Company);
-      var result = capturadeOC.SendMail(ocPDF, revisionPDF, ocLotePDF);
+      var result = capturadeOC.SendMail(ocPDF, revisionPDF, ocLotePDF,Company);
       return Json(result);
     }
 
@@ -152,10 +152,10 @@ namespace CodigosQRComprasCEDIS_2._0.Controllers
       return Json(new { data = ListaOc });
     }
 
-    public async Task<JsonResult> SendMailRecibosAsync(String oc, String revision, String Company)
+    public async Task<JsonResult> SendMailRecibosAsync(String oc, String revision, String company)
     {
-      CapturadeOC captura = new CapturadeOC(Company);
-      var result = await captura.SendMailRecibos(oc, revision);
+      CapturadeOC captura = new CapturadeOC(company);
+      var result = await captura.SendMailRecibos(oc, revision, company);
       return Json(result);
     }
   }
